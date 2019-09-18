@@ -103,7 +103,7 @@ func instanceTypeConfigSchema() *schema.Resource {
 				ForceNew: true,
 			},
 			"ebs_config": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				Optional: true,
 				Computed: true,
 				Elem: &schema.Resource{
@@ -128,7 +128,6 @@ func instanceTypeConfigSchema() *schema.Resource {
 						},
 					},
 				},
-				Set: resourceAwsEMRClusterEBSConfigHash,
 			},
 			"instance_type": {
 				Type:     schema.TypeString,
@@ -305,8 +304,8 @@ func expandInstanceTypeConfigs(instanceTypeConfigs []interface{}) []*emr.Instanc
 			config.Configurations = expandConfigurations(v.List())
 		}
 
-		if v, ok := configAttributes["ebs_config"].(*schema.Set); ok && v.Len() == 1 {
-			config.EbsConfiguration = expandEbsConfiguration(v.List())
+		if v, ok := configAttributes["ebs_config"]; ok {
+			config.EbsConfiguration = expandEbsConfiguration(v.([]interface{}))
 
 			if v, ok := configAttributes["ebs_optimized"].(bool); ok {
 				config.EbsConfiguration.EbsOptimized = aws.Bool(v)
@@ -332,7 +331,7 @@ func expandConfigurations(configurations []interface{}) []*emr.Configuration {
 		}
 
 		if rawConfig, ok := configAttributes["configurations"]; ok {
-			config.Configurations = expandConfigurations(rawConfig.([]interface{}))
+			config.Configurations = expandConfigurations(rawConfig.(*schema.Set).List())
 		}
 
 		if v, ok := configAttributes["properties"]; ok {

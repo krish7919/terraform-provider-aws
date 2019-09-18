@@ -335,7 +335,7 @@ func resourceAwsEMRCluster() *schema.Resource {
 							ForceNew: true,
 						},
 						"ebs_config": {
-							Type:     schema.TypeSet,
+							Type:     schema.TypeList,
 							Optional: true,
 							Computed: true,
 							ForceNew: true,
@@ -365,7 +365,6 @@ func resourceAwsEMRCluster() *schema.Resource {
 									},
 								},
 							},
-							Set: resourceAwsEMRClusterEBSConfigHash,
 						},
 						"id": {
 							Type:     schema.TypeString,
@@ -405,7 +404,7 @@ func resourceAwsEMRCluster() *schema.Resource {
 							ForceNew: true,
 						},
 						"ebs_config": {
-							Type:     schema.TypeSet,
+							Type:     schema.TypeList,
 							Optional: true,
 							Computed: true,
 							ForceNew: true,
@@ -435,7 +434,6 @@ func resourceAwsEMRCluster() *schema.Resource {
 									},
 								},
 							},
-							Set: resourceAwsEMRClusterEBSConfigHash,
 						},
 						"id": {
 							Type:     schema.TypeString,
@@ -475,7 +473,7 @@ func resourceAwsEMRCluster() *schema.Resource {
 							Optional: true,
 						},
 						"ebs_config": {
-							Type:     schema.TypeSet,
+							Type:     schema.TypeList,
 							Optional: true,
 							Computed: true,
 							Elem: &schema.Resource{
@@ -500,7 +498,6 @@ func resourceAwsEMRCluster() *schema.Resource {
 									},
 								},
 							},
-							Set: resourceAwsEMRClusterEBSConfigHash,
 						},
 						"instance_count": {
 							Type:     schema.TypeInt,
@@ -2210,7 +2207,7 @@ func expandEbsConfig(configAttributes map[string]interface{}, config *emr.Instan
 		ebsConfig := &emr.EbsConfiguration{}
 
 		ebsBlockDeviceConfigs := make([]*emr.EbsBlockDeviceConfig, 0)
-		for _, rawEbsConfig := range rawEbsConfigs.(*schema.Set).List() {
+		for _, rawEbsConfig := range rawEbsConfigs.([]interface{}) {
 			rawEbsConfig := rawEbsConfig.(map[string]interface{})
 			ebsBlockDeviceConfig := &emr.EbsBlockDeviceConfig{
 				VolumesPerInstance: aws.Int64(int64(rawEbsConfig["volumes_per_instance"].(int))),
