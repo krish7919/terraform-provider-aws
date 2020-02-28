@@ -13,6 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/apigateway"
 	"github.com/aws/aws-sdk-go/service/cognitoidentity"
 	"github.com/aws/aws-sdk-go/service/configservice"
+	"github.com/aws/aws-sdk-go/service/emr"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/waf"
 	"github.com/hashicorp/terraform/helper/resource"
@@ -2369,5 +2370,36 @@ func validateRoute53ResolverName(v interface{}, k string) (ws []string, errors [
 			"%q cannot be greater than 64 characters", k))
 	}
 
+	return
+}
+
+func validateAwsEmrSpotProvisioningTimeOutAction(v interface{}, k string) (ws []string, errors []error) {
+	validTypes := map[string]struct{}{
+		emr.SpotProvisioningTimeoutActionSwitchToOnDemand: {},
+		emr.SpotProvisioningTimeoutActionTerminateCluster: {},
+	}
+
+	value := v.(string)
+
+	if _, ok := validTypes[value]; !ok {
+		errors = append(errors, fmt.Errorf(
+			"%q must be one of [%q, %q]", k, emr.SpotProvisioningTimeoutActionSwitchToOnDemand, emr.SpotProvisioningTimeoutActionTerminateCluster))
+	}
+	return
+}
+
+func validateAwsEmrInstanceFleetType(v interface{}, k string) (ws []string, errors []error) {
+	validTypes := map[string]struct{}{
+		emr.InstanceFleetTypeMaster: {},
+		emr.InstanceFleetTypeCore:   {},
+		emr.InstanceFleetTypeTask:   {},
+	}
+
+	value := v.(string)
+
+	if _, ok := validTypes[value]; !ok {
+		errors = append(errors, fmt.Errorf(
+			"%q must be one of [%q, %q, %q]", k, emr.InstanceFleetTypeMaster, emr.InstanceFleetTypeCore, emr.InstanceFleetTypeTask))
+	}
 	return
 }
